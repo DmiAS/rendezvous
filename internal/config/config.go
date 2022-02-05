@@ -16,6 +16,10 @@ type ServerConfig struct {
 	Debug bool
 }
 
+type MongoConfig struct {
+	DSN string
+}
+
 const (
 	configName = "config"
 	configType = "yaml"
