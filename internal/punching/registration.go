@@ -2,6 +2,7 @@ package punching
 
 import (
 	"context"
+	"net"
 
 	"github.com/rs/zerolog/log"
 
@@ -12,7 +13,9 @@ import (
 func (p *Puncher) register(req request) {
 	reg := &proto.Registration{}
 	if err := reg.Unmarshal(req.data); err != nil {
-		log.Error().Err(err).Msg("failure to unmarshal registration")
+		msg := "failure to unmarshal registration"
+		log.Error().Err(err).Msg(msg)
+		p.sendRegisterApprove(req.addr, msg)
 		return
 	}
 	user := &model.User{
@@ -21,6 +24,27 @@ func (p *Puncher) register(req request) {
 		GlobalAddress: req.addr.String(),
 	}
 	if err := p.u.AddUser(context.Background(), user); err != nil {
-		log.Error().Err(err).Msg("failure to add new user")
+		msg := "failure to add new user"
+		log.Error().Err(err).Msg(msg)
+		p.sendRegisterApprove(req.addr, msg)
+		return
+	}
+	p.sendRegisterApprove(req.addr, "")
+}
+
+func (p *Puncher) sendRegisterApprove(addr net.Addr, msg string) {
+	approve := proto.RegistrationApprove{
+		Error: false,
+		Msg:   msg,
+	}
+	if msg != "" {
+		approve.Error = true
+	}
+	data, err := approve.Marshal()
+	if err != nil {
+		log.Error().Err(err).Msgf("failure to marshal approve information for %s", addr)
+	}
+	if err := p.send(addr, data); err != nil {
+		log.Error().Err(err).Msgf("failure to send approve information for %s", addr)
 	}
 }
