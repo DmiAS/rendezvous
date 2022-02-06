@@ -1,8 +1,9 @@
 package model
 
 type User struct {
-	Name    string `json:"name" bson:"name"`
-	Address string `json:"address" bson:"address"`
+	Name          string `bson:"name"`
+	LocalAddress  string `bson:"local_address"`
+	GlobalAddress string `bson:"global_address"`
 }
 type Users []User
 

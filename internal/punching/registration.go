@@ -15,8 +15,9 @@ func (p *Puncher) register(req request) {
 		log.Error().Err(err).Msg("failure to unmarshal registration")
 	}
 	user := &model.User{
-		Name:    reg.User,
-		Address: reg.Address,
+		Name:          reg.User,
+		LocalAddress:  reg.Address,
+		GlobalAddress: req.addr.String(),
 	}
 	if err := p.u.AddUser(context.Background(), user); err != nil {
 		log.Error().Err(err).Msg("failure to add new user")
