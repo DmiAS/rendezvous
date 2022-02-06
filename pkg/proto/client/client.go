@@ -90,7 +90,7 @@ func (c *Client) waitRegApprove() error {
 				continue
 			}
 			if approve.Error {
-				return fmt.Errorf("failure to register: %s", approve.Error)
+				return fmt.Errorf("failure to register: %s", approve.Msg)
 			}
 			return nil
 		}
