@@ -14,12 +14,14 @@ import (
 
 type UserService interface {
 	AddUser(ctx context.Context, user *model.User) error
+	GetUser(ctx context.Context, login string) (*model.User, error)
 	DeleteUser(ctx context.Context, login string) error
 }
 
 type Puncher struct {
 	u        UserService
 	requests chan request
+	pc       net.PacketConn
 }
 
 const (
@@ -33,19 +35,20 @@ func NewPuncher(u UserService) *Puncher {
 }
 
 func (p *Puncher) Listen(ctx context.Context) error {
-	pc, err := net.ListenPacket(network, port)
+	var err error
+	p.pc, err = net.ListenPacket(network, port)
 	if err != nil {
 		return fmt.Errorf("failture to create socket")
 	}
-	defer pc.Close()
+	defer p.pc.Close()
 
 	for {
-		p.handleConnection(pc)
+		p.handleConnection()
 	}
 }
 
-func (p Puncher) handleConnection(pc net.PacketConn) {
-	data, clientAddr, err := readAll(pc)
+func (p Puncher) handleConnection() {
+	data, clientAddr, err := readAll(p.pc)
 	if err != nil {
 		log.Error().Err(err).Msg("failure to read datagram from socket")
 	}

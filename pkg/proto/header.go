@@ -7,6 +7,7 @@ import (
 
 const (
 	RegisterAction = iota
+	InitiateConnectionAction
 )
 
 type Header struct {
