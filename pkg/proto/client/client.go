@@ -25,6 +25,7 @@ const (
 	connectTimeout = time.Second * 5
 	punchTimeout   = time.Minute
 	clientID       = "client"
+	pingMessage    = "ping"
 )
 
 func NewClient(ctx context.Context, name string, port string, rendezvousAddress string) (*Client, error) {
@@ -186,7 +187,7 @@ func (c *Client) waitConnResponse(ch chan Request) (*proto.ConnResponse, error) 
 	for {
 		select {
 		case <-ctx.Done():
-			return nil, fmt.Errorf("failure to get registration approve before timeout")
+			return nil, fmt.Errorf("failure to get connection before timeout")
 		case req := <-ch:
 			connResp := &proto.ConnResponse{}
 			if err := connResp.Unmarshal(req.data); err != nil {
@@ -197,9 +198,14 @@ func (c *Client) waitConnResponse(ch chan Request) (*proto.ConnResponse, error) 
 		}
 	}
 }
-
 func (c *Client) punch(connResp *proto.ConnResponse) (net.Addr, error) {
-	ping := []byte("ping")
+	ping := &proto.Punch{Msg: pingMessage}
+	header := &proto.Header{Action: proto.PunchMessage}
+
+	data, err := proto.Packet{Header: header, Data: ping}.Marshal()
+	if err != nil {
+		return nil, fmt.Errorf("failure to marshal packet")
+	}
 
 	globalAddress, err := net.ResolveUDPAddr(network, connResp.GlobalAddress)
 	if err != nil {
@@ -214,30 +220,22 @@ func (c *Client) punch(connResp *proto.ConnResponse) (net.Addr, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), punchTimeout)
 	defer cancel()
 
-	if err := c.conn.SetReadDeadline(time.Now().Add(time.Millisecond * 500)); err != nil {
-		log.Debug().Err(err).Msg("failure to send timeout")
-	}
 	for {
 		select {
 		case <-ctx.Done():
 			return nil, fmt.Errorf("failure to punch, timeout")
 		default:
-			_, err := c.conn.WriteTo(ping, globalAddress)
-			if err != nil {
+			_, err := c.conn.WriteTo(data, globalAddress)
+			if err == nil {
 				return globalAddress, nil
 			}
 			log.Debug().Err(err).Msgf("failed to send data on globalAddress %s", globalAddress)
 
-			_, err = c.conn.WriteTo(ping, localAddress)
-			if err != nil {
+			_, err = c.conn.WriteTo(data, localAddress)
+			if err == nil {
 				return localAddress, nil
 			}
 			log.Debug().Err(err).Msgf("failed to send data on localAddress %s", localAddress)
-
-			buf := [512]byte{}
-			if _, addr, err := c.conn.ReadFrom(buf[:]); err != nil {
-				return addr, nil
-			}
 		}
 	}
 }

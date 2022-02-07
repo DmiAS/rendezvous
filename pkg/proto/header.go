@@ -11,6 +11,7 @@ const (
 	RequestForConnection
 	ResponseConnection
 	MessageReceive
+	PunchMessage
 )
 
 type Header struct {

@@ -59,8 +59,10 @@ func (p *Puncher) initConnection(req request) {
 }
 
 func (p *Puncher) sendUserData(globalAddr string, user *model.User) error {
-	info := proto.ConnResponse{GlobalAddress: user.GlobalAddress, LocalAddress: user.LocalAddress}
-	data, err := info.Marshal()
+	info := &proto.ConnResponse{GlobalAddress: user.GlobalAddress, LocalAddress: user.LocalAddress}
+	header := &proto.Header{Action: proto.ResponseConnection}
+
+	data, err := proto.Packet{Header: header, Data: info}.Marshal()
 	if err != nil {
 		return fmt.Errorf("failure to marshal conn response data: %+v: %s", info, err)
 	}
@@ -77,12 +79,7 @@ func (p *Puncher) sendUserData(globalAddr string, user *model.User) error {
 }
 
 func (p *Puncher) send(addr net.Addr, data []byte) error {
-	// set deadline to interrupt in case of long write operation
-	deadline := time.Now().Add(writeDeadline)
-	if err := p.pc.SetWriteDeadline(deadline); err != nil {
-		return fmt.Errorf("failure to set write deadline")
-	}
-
+	log.Debug().Msgf("send data to addr: %s", addr.String())
 	n, err := p.pc.WriteTo(data, addr)
 	if err != nil {
 		return fmt.Errorf("failure to write data to socket: %s", err)

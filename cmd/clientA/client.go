@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"time"
 
 	"github.com/rs/zerolog/log"
 
@@ -18,4 +19,6 @@ func main() {
 	if err := cli.Register(); err != nil {
 		log.Fatal().Err(err).Msgf("failure to register client %s", err)
 	}
+
+	<-time.After(time.Minute * 20)
 }
