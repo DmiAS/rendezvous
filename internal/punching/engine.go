@@ -1,9 +1,7 @@
 package punching
 
 import (
-	"bytes"
 	"context"
-	"io"
 	"net"
 
 	"github.com/rs/zerolog/log"
@@ -42,7 +40,7 @@ func (p *Puncher) Listen(ctx context.Context) {
 	defer p.pc.Close()
 
 	log.Info().Msgf("server started listen on: %s", p.pc.LocalAddr().String())
-
+	go p.handleActions(ctx)
 	for {
 		select {
 		case <-ctx.Done():
@@ -60,24 +58,16 @@ func (p Puncher) handleConnection() {
 		log.Error().Err(err).Msg("failure to read datagram from socket")
 	}
 	req := request{data: data, addr: clientAddr}
-	log.Debug().Msgf("sending new request: %+v", req)
+	log.Debug().Msgf("sending new request", req)
 	p.requests <- req
 }
 
 func readAll(pc net.PacketConn) ([]byte, net.Addr, error) {
 	buffer := [512]byte{}
-	res := &bytes.Buffer{}
-	var clientAddr net.Addr
-	for {
-		read, addr, err := pc.ReadFrom(buffer[:])
-		if err != nil {
-			if err == io.EOF {
-				clientAddr = addr
-				break
-			}
-			return nil, nil, err
-		}
-		res.Write(buffer[:read])
+	read, addr, err := pc.ReadFrom(buffer[:])
+	if err != nil {
+		return nil, nil, err
 	}
-	return res.Bytes(), clientAddr, nil
+	log.Debug().Msgf("%d bytes was read", read)
+	return buffer[:read], addr, nil
 }

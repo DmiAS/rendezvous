@@ -15,7 +15,7 @@ type RegistrationApprove struct {
 	Msg   string
 }
 
-func (r *Registration) Marshal() ([]byte, error) {
+func (r Registration) Marshal() ([]byte, error) {
 	buf := new(bytes.Buffer)
 
 	enc := gob.NewEncoder(buf)
@@ -37,7 +37,7 @@ func (r *Registration) Unmarshal(data []byte) error {
 	return nil
 }
 
-func (r *RegistrationApprove) Marshal() ([]byte, error) {
+func (r RegistrationApprove) Marshal() ([]byte, error) {
 	buf := new(bytes.Buffer)
 
 	enc := gob.NewEncoder(buf)

@@ -55,10 +55,13 @@ func (c *Client) sendRegRequest() error {
 		User:    c.name,
 		Address: c.localAddress,
 	}
-	data, err := reg.Marshal()
+	header := &proto.Header{Action: proto.RegisterAction}
+	packet := &proto.Packet{Header: header, Data: reg}
+	data, err := packet.Marshal()
 	if err != nil {
-		return fmt.Errorf("failure to marshal reg info: %s", err)
+		return fmt.Errorf("failure to marshal packet: %s", err)
 	}
+
 	n, err := c.conn.WriteTo(data, c.rendezvousAddress)
 	if err != nil {
 		return fmt.Errorf("failure to send data: %s", err)
@@ -78,8 +81,10 @@ func (c *Client) waitRegApprove() error {
 		case <-ctx.Done():
 			return fmt.Errorf("failure to get registration approve before timeout")
 		case data := <-resp:
+			header := &proto.Header{}
 			approve := &proto.RegistrationApprove{}
-			if err := approve.Unmarshal(data); err != nil {
+			packet := &proto.Packet{Header: header, Data: approve}
+			if err := packet.Unmarshal(data); err != nil {
 				log.Debug().Err(err).Msg("failure to unmarshal registration approval")
 				continue
 			}
@@ -150,10 +155,12 @@ func (c *Client) waitServerResponse(ctx context.Context, timeout time.Duration, 
 			data := [512]byte{}
 			if err := c.conn.SetReadDeadline(time.Now().Add(timeout)); err != nil {
 				log.Debug().Err(err).Msg("failure to set timeout")
+				return
 			}
 			n, addr, err := c.conn.ReadFrom(data[:])
 			if err != nil {
 				log.Error().Err(err).Msg("failure to read from conn")
+				return
 			}
 			if addr.String() == c.rendezvousAddress.String() {
 				resp <- data[:n]

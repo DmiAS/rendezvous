@@ -33,14 +33,17 @@ func (p *Puncher) register(req request) {
 }
 
 func (p *Puncher) sendRegisterApprove(addr net.Addr, msg string) {
-	approve := proto.RegistrationApprove{
+	approve := &proto.RegistrationApprove{
 		Error: false,
 		Msg:   msg,
 	}
 	if msg != "" {
 		approve.Error = true
 	}
-	data, err := approve.Marshal()
+	header := &proto.Header{Action: proto.RegisterApprove}
+	packet := &proto.Packet{Data: approve, Header: header}
+
+	data, err := packet.Marshal()
 	if err != nil {
 		log.Error().Err(err).Msgf("failure to marshal approve information for %s", addr)
 	}

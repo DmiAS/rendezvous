@@ -21,12 +21,13 @@ func (p *Puncher) handleActions(ctx context.Context) {
 			log.Info().Msg("stop handling punching requests")
 			return
 		case request := <-p.requests:
-			header := &proto.Header{}
-			if err := header.Unmarshal(request.data); err != nil {
+			header, data, err := proto.GetHeader(request.data)
+			if err != nil {
 				log.Error().Err(err).Msg("failure to parse request header")
+				return
 			}
 			// change data because we've already read first byte
-			request.data = request.data[1:]
+			request.data = data
 			switch header.Action {
 			case proto.RegisterAction:
 				p.register(request)
