@@ -164,6 +164,7 @@ func (c *Client) waitServerResponse(ctx context.Context, timeout time.Duration, 
 			}
 			if addr.String() == c.rendezvousAddress.String() {
 				resp <- data[:n]
+				return
 			}
 		}
 	}
