@@ -12,7 +12,7 @@ import (
 func (r *Router) GetUsers(c *fiber.Ctx) error {
 	users, err := r.u.GetUsers(c.UserContext())
 	if err != nil {
-		log.Error().Err(err)
+		log.Error().Err(err).Msg("failure to get users")
 		return c.Status(http.StatusInternalServerError).JSON(model.ErrorResponse{Msg: "can not get list of users"})
 	}
 	return c.Status(http.StatusOK).JSON(users)
