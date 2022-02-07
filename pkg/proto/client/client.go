@@ -57,7 +57,9 @@ func (c *Client) Register() error {
 		return err
 	}
 
-	return c.waitRegApprove()
+	ch := c.listener.Subscribe(clientID, proto.RegisterApprove)
+	defer c.listener.Unsubscribe(clientID, proto.RegisterApprove)
+	return c.waitRegApprove(ch)
 }
 
 func (c *Client) sendRegRequest() error {
@@ -80,43 +82,32 @@ func (c *Client) sendRegRequest() error {
 	return nil
 }
 
-func (c *Client) waitRegApprove() error {
+func (c *Client) waitRegApprove(ch chan Request) error {
 	ctx, cancel := context.WithTimeout(context.Background(), approveTimeout)
 	defer cancel()
 
-	ch := c.listener.Subscribe(clientID, proto.RegisterApprove)
 	for {
 		select {
 		case <-ctx.Done():
 			return fmt.Errorf("timeout")
 		case <-ch:
-			c.listener.Unsubscribe(clientID, proto.RegisterApprove)
 			return nil
 		}
 	}
 }
 
 func (c *Client) ConnectTo(targetName string) (net.Addr, error) {
-	request := &proto.ConnRequest{
-		Initiator: c.name,
-		Target:    targetName,
+	if err := c.initConnection(targetName); err != nil {
+		return nil, err
 	}
 
-	data, err := request.Marshal()
+	ch := c.listener.Subscribe(clientID, proto.ResponseConnection)
+	connResp, err := c.waitConnResponse(ch)
 	if err != nil {
-		return nil, fmt.Errorf("failure to marshal connection request: %s", err)
-	}
-
-	n, err := c.conn.WriteTo(data, c.rendezvousAddress)
-	if err != nil {
-		return nil, fmt.Errorf("failure to send data to server: %s", err)
-	}
-	log.Debug().Msgf("%d bytes sent from %d", n, len(data))
-
-	connResp, err := c.waitConnResponse()
-	if err != nil {
+		c.listener.Unsubscribe(clientID, proto.ResponseConnection)
 		return nil, fmt.Errorf("failure to get response from server: %s", err)
 	}
+	c.listener.Unsubscribe(clientID, proto.ResponseConnection)
 
 	addr, err := c.punch(connResp)
 	if err != nil {
@@ -125,47 +116,42 @@ func (c *Client) ConnectTo(targetName string) (net.Addr, error) {
 	return addr, nil
 }
 
-func (c *Client) waitConnResponse() (*proto.ConnResponse, error) {
+func (c *Client) initConnection(targetName string) error {
+	request := &proto.ConnRequest{
+		Initiator: c.name,
+		Target:    targetName,
+	}
+	header := &proto.Header{Action: proto.RequestForConnection}
+
+	packet := &proto.Packet{Header: header, Data: request}
+	data, err := packet.Marshal()
+	if err != nil {
+		return fmt.Errorf("failure to marshal connection request: %s", err)
+	}
+
+	n, err := c.conn.WriteTo(data, c.rendezvousAddress)
+	if err != nil {
+		return fmt.Errorf("failure to send data to server: %s", err)
+	}
+	log.Debug().Msgf("%d bytes sent from %d", n, len(data))
+	return nil
+}
+
+func (c *Client) waitConnResponse(ch chan Request) (*proto.ConnResponse, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), connectTimeout)
 	defer cancel()
 
-	resp := make(chan []byte)
-	go c.waitServerResponse(ctx, connectTimeout, resp)
 	for {
 		select {
 		case <-ctx.Done():
 			return nil, fmt.Errorf("failure to get registration approve before timeout")
-		case data := <-resp:
+		case req := <-ch:
 			connResp := &proto.ConnResponse{}
-			if err := connResp.Unmarshal(data); err != nil {
+			if err := connResp.Unmarshal(req.data); err != nil {
 				log.Debug().Err(err).Msg("failure to unmarshal connection response")
 				continue
 			}
 			return connResp, nil
-		}
-	}
-}
-
-func (c *Client) waitServerResponse(ctx context.Context, timeout time.Duration, resp chan []byte) {
-	for {
-		select {
-		case <-ctx.Done():
-			log.Info().Msg("stop waiting server response")
-		default:
-			data := [512]byte{}
-			if err := c.conn.SetReadDeadline(time.Now().Add(timeout)); err != nil {
-				log.Debug().Err(err).Msg("failure to set timeout")
-				return
-			}
-			n, addr, err := c.conn.ReadFrom(data[:])
-			if err != nil {
-				log.Error().Err(err).Msg("failure to read from conn")
-				return
-			}
-			if addr.String() == c.rendezvousAddress.String() {
-				resp <- data[:n]
-				return
-			}
 		}
 	}
 }
