@@ -15,11 +15,11 @@ type UsersRepository struct {
 }
 
 const (
-	collection = "Users"
+	userCollection = "Users"
 )
 
 func NewUsersRepository(db *mongo.Database) *UsersRepository {
-	return &UsersRepository{c: db.Collection(collection)}
+	return &UsersRepository{c: db.Collection(userCollection)}
 }
 
 func (u UsersRepository) GetUsers(ctx context.Context) (model.Users, error) {
