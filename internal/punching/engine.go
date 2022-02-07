@@ -3,7 +3,6 @@ package punching
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"io"
 	"net"
 
@@ -34,16 +33,22 @@ func NewPuncher(u UserService) *Puncher {
 	return &Puncher{u: u, requests: make(chan request, workers)}
 }
 
-func (p *Puncher) Listen(ctx context.Context) error {
+func (p *Puncher) Listen(ctx context.Context) {
 	var err error
 	p.pc, err = net.ListenPacket(network, port)
 	if err != nil {
-		return fmt.Errorf("failture to create socket")
+		log.Fatal().Err(err).Msg("failure to create socket")
 	}
 	defer p.pc.Close()
 
 	for {
-		p.handleConnection()
+		select {
+		case <-ctx.Done():
+			log.Info().Msg("punch server shutdown")
+			return
+		default:
+			p.handleConnection()
+		}
 	}
 }
 

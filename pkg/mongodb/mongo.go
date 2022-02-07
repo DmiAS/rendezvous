@@ -11,7 +11,12 @@ import (
 
 const timeout = 1 * time.Second
 
-func NewConnection(dsn, database string) (*mongo.Database, error) {
+type Connection struct {
+	Conn *mongo.Client
+	Db   *mongo.Database
+}
+
+func NewConnection(dsn, database string) (*Connection, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 	conn, err := mongo.Connect(ctx, options.Client().ApplyURI(dsn))
@@ -23,5 +28,5 @@ func NewConnection(dsn, database string) (*mongo.Database, error) {
 	if err := conn.Ping(ctx, nil); err != nil {
 		return nil, fmt.Errorf("failture to check connection: %s", err)
 	}
-	return conn.Database(database), nil
+	return &Connection{Conn: conn, Db: conn.Database(database)}, nil
 }

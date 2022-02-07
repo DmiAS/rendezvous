@@ -8,7 +8,7 @@ import (
 )
 
 type UserRepository interface {
-	GetUsers(ctx context.Context) (model.InnerUsers, error)
+	GetUsers(ctx context.Context) (model.Users, error)
 	GetUser(ctx context.Context, login string) (*model.User, error)
 	CreateUser(ctx context.Context, user *model.User) error
 	UpdateUser(ctx context.Context, user *model.User) error
@@ -18,8 +18,8 @@ type UserService struct {
 	r UserRepository
 }
 
-func NewUserService() *UserService {
-	return &UserService{}
+func NewUserService(r UserRepository) *UserService {
+	return &UserService{r: r}
 }
 
 func (u *UserService) GetUsers(ctx context.Context) (model.InnerUsers, error) {

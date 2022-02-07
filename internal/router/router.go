@@ -7,12 +7,12 @@ import (
 )
 
 type UserService interface {
-	GetUsers(ctx context.Context) (model.Users, error)
+	GetUsers(ctx context.Context) (model.InnerUsers, error)
 }
 type Router struct {
 	u UserService
 }
 
-func NewRouter() *Router {
-	return &Router{}
+func NewRouter(u UserService) *Router {
+	return &Router{u: u}
 }

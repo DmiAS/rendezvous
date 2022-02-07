@@ -8,6 +8,7 @@ import (
 
 type Config struct {
 	Server ServerConfig
+	Db     MongoConfig
 }
 
 type ServerConfig struct {
@@ -17,7 +18,8 @@ type ServerConfig struct {
 }
 
 type MongoConfig struct {
-	DSN string
+	DSN      string
+	Database string
 }
 
 const (
