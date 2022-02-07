@@ -27,7 +27,12 @@ const (
 	clientID       = "client"
 )
 
-func NewClient(ctx context.Context, name string, rendezvousAddress string, localAddress string) (*Client, error) {
+func NewClient(ctx context.Context, name string, port string, rendezvousAddress string) (*Client, error) {
+	localAddress, err := resolveLocalIpAddress()
+	if err != nil {
+		return nil, fmt.Errorf("failure to get local address: %s", err)
+	}
+	localAddress += ":" + port
 	conn, err := net.ListenPacket(network, localAddress)
 	if err != nil {
 		return nil, fmt.Errorf("failure to open udp port: %s", err)
@@ -46,6 +51,43 @@ func NewClient(ctx context.Context, name string, rendezvousAddress string, local
 		rendezvousAddress: addr, localAddress: localAddress, conn: conn, name: name,
 		listener: l,
 	}, nil
+}
+
+func resolveLocalIpAddress() (string, error) {
+	ifaces, err := net.Interfaces()
+	if err != nil {
+		return "", err
+	}
+	for _, iface := range ifaces {
+		if iface.Flags&net.FlagUp == 0 {
+			continue // interface down
+		}
+		if iface.Flags&net.FlagLoopback != 0 {
+			continue // loopback interface
+		}
+		addrs, err := iface.Addrs()
+		if err != nil {
+			return "", err
+		}
+		for _, addr := range addrs {
+			var ip net.IP
+			switch v := addr.(type) {
+			case *net.IPNet:
+				ip = v.IP
+			case *net.IPAddr:
+				ip = v.IP
+			}
+			if ip == nil || ip.IsLoopback() {
+				continue
+			}
+			ip = ip.To4()
+			if ip == nil {
+				continue // not an ipv4 address
+			}
+			return ip.String(), nil
+		}
+	}
+	return "", fmt.Errorf("pc is not connected to the network")
 }
 
 func (c *Client) Close() error {

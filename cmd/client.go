@@ -10,7 +10,7 @@ import (
 
 func main() {
 	ctx := context.Background()
-	cli, err := client.NewClient(ctx, "a", "localhost:9000", "localhost:11000")
+	cli, err := client.NewClient(ctx, "a", "11000", "localhost:9000")
 	if err != nil {
 		log.Fatal().Err(err).Msg("failure to create client")
 	}

@@ -10,6 +10,7 @@ const (
 	RegisterApprove
 	RequestForConnection
 	ResponseConnection
+	MessageReceive
 )
 
 type Header struct {

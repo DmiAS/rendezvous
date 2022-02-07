@@ -31,7 +31,7 @@ func (p *Puncher) handleActions(ctx context.Context) {
 			switch header.Action {
 			case proto.RegisterAction:
 				p.register(request)
-			case proto.InitiateConnectionAction:
+			case proto.RequestForConnection:
 				p.initConnection(request)
 			}
 		}

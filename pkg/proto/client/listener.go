@@ -92,6 +92,8 @@ func (l *Listener) notifySubs(req Request) {
 		return
 	}
 	req.data = data
+	log.Debug().Msgf("new message with action: %d", header)
+
 	l.mu.RLock()
 	for _, sub := range l.subs[header.Action] {
 		ctx, cancel := context.WithTimeout(context.Background(), sendTimeout)
