@@ -16,6 +16,7 @@ type Client struct {
 	rendezvousAddress net.Addr
 	localAddress      string
 	conn              net.PacketConn
+	listener          *Listener
 }
 
 const (
@@ -23,9 +24,10 @@ const (
 	approveTimeout = time.Second * 3
 	connectTimeout = time.Second * 5
 	punchTimeout   = time.Minute
+	clientID       = "client"
 )
 
-func NewClient(name string, rendezvousAddress string, localAddress string) (*Client, error) {
+func NewClient(ctx context.Context, name string, rendezvousAddress string, localAddress string) (*Client, error) {
 	conn, err := net.ListenPacket(network, localAddress)
 	if err != nil {
 		return nil, fmt.Errorf("failure to open udp port: %s", err)
@@ -35,7 +37,15 @@ func NewClient(name string, rendezvousAddress string, localAddress string) (*Cli
 	if err != nil {
 		return nil, fmt.Errorf("failure to resolve rendezvous adress %s: %s", rendezvousAddress, err)
 	}
-	return &Client{rendezvousAddress: addr, localAddress: localAddress, conn: conn, name: name}, nil
+
+	// start listening
+	l := NewListener(conn)
+	go l.Listen(ctx)
+
+	return &Client{
+		rendezvousAddress: addr, localAddress: localAddress, conn: conn, name: name,
+		listener: l,
+	}, nil
 }
 
 func (c *Client) Close() error {
@@ -74,23 +84,13 @@ func (c *Client) waitRegApprove() error {
 	ctx, cancel := context.WithTimeout(context.Background(), approveTimeout)
 	defer cancel()
 
-	resp := make(chan []byte)
-	go c.waitServerResponse(ctx, approveTimeout, resp)
+	ch := c.listener.Subscribe(clientID, proto.RegisterApprove)
 	for {
 		select {
 		case <-ctx.Done():
-			return fmt.Errorf("failure to get registration approve before timeout")
-		case data := <-resp:
-			header := &proto.Header{}
-			approve := &proto.RegistrationApprove{}
-			packet := &proto.Packet{Header: header, Data: approve}
-			if err := packet.Unmarshal(data); err != nil {
-				log.Debug().Err(err).Msg("failure to unmarshal registration approval")
-				continue
-			}
-			if approve.Error {
-				return fmt.Errorf("failure to register: %s", approve.Msg)
-			}
+			return fmt.Errorf("timeout")
+		case <-ch:
+			c.listener.Unsubscribe(clientID, proto.RegisterApprove)
 			return nil
 		}
 	}
