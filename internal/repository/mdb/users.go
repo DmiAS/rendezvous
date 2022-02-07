@@ -15,7 +15,7 @@ type UsersRepository struct {
 }
 
 const (
-	collection = "users"
+	collection = "Users"
 )
 
 func NewUsersRepository(db *mongo.Database) *UsersRepository {

@@ -17,14 +17,14 @@ type Connection struct {
 }
 
 func NewConnection(dsn, database string) (*Connection, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-	conn, err := mongo.Connect(ctx, options.Client().ApplyURI(dsn))
+	conn, err := mongo.Connect(context.Background(), options.Client().ApplyURI(dsn))
 	if err != nil {
 		return nil, fmt.Errorf("failure to connect to database: %s", err)
 	}
 
 	// check the connection
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
 	if err := conn.Ping(ctx, nil); err != nil {
 		return nil, fmt.Errorf("failture to check connection: %s", err)
 	}

@@ -8,7 +8,7 @@ import (
 
 type Config struct {
 	Server ServerConfig
-	Db     MongoConfig
+	Mongo  MongoConfig
 }
 
 type ServerConfig struct {

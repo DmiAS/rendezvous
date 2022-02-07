@@ -2,9 +2,11 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
 
+	"github.com/joho/godotenv"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/rs/zerolog/pkgerrors"
@@ -23,6 +25,11 @@ const (
 )
 
 func main() {
+	// load env from .env file
+	if err := godotenv.Load(); err != nil {
+		fmt.Printf("failure to load env")
+	}
+
 	// read configuration
 	cfg, err := config.NewConfig(os.Getenv(configEnv))
 	if err != nil {
@@ -33,7 +40,7 @@ func main() {
 	setupLogger(cfg)
 
 	// initialize db connection
-	mongoConn, err := mongodb.NewConnection(cfg.Db.DSN, cfg.Db.Database)
+	mongoConn, err := mongodb.NewConnection(cfg.Mongo.DSN, cfg.Mongo.Database)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failure to initialize connection to mongo")
 	}

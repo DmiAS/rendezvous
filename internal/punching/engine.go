@@ -25,7 +25,7 @@ type Puncher struct {
 
 const (
 	network = "udp"
-	port    = "9000"
+	port    = ":9000"
 	workers = 5
 )
 
@@ -40,6 +40,8 @@ func (p *Puncher) Listen(ctx context.Context) {
 		log.Fatal().Err(err).Msg("failure to create socket")
 	}
 	defer p.pc.Close()
+
+	log.Info().Msgf("server started listen on: %s", p.pc.LocalAddr().String())
 
 	for {
 		select {

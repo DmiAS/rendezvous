@@ -2,3 +2,6 @@ server:
   host: "localhost"
   port: 5432
   debug: true
+mongo:
+  dsn: "mongodb://user:password@localhost:27020/?authSource=admin"
+  database: "Punch"

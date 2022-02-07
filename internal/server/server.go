@@ -26,7 +26,7 @@ func NewServer(cfg config.ServerConfig, router *router.Router) *Server {
 	}
 	srv.app = fiber.New(
 		fiber.Config{
-			DisableStartupMessage: true,
+			DisableStartupMessage: false,
 			CaseSensitive:         true,
 			StrictRouting:         true,
 		},
@@ -37,6 +37,7 @@ func NewServer(cfg config.ServerConfig, router *router.Router) *Server {
 }
 
 func (s *Server) Run() {
+	log.Info().Msgf("server started listen on address: %s", s.hostAddress)
 	if err := s.app.Listen(s.hostAddress); err != nil && err != http.ErrServerClosed {
 		log.Fatal().
 			Err(err).
