@@ -30,3 +30,12 @@ func (f *FileRepository) CreateOrUpdateFiles(ctx context.Context, record *model.
 	}
 	return nil
 }
+
+func (f *FileRepository) GetFiles(ctx context.Context, user string) (*model.FileRecord, error) {
+	res := f.c.FindOne(ctx, bson.D{{"user", user}})
+	record := &model.FileRecord{}
+	if err := res.Decode(record); err != nil {
+		return nil, fmt.Errorf("failure to decode file record: %s", err)
+	}
+	return record, nil
+}

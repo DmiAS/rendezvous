@@ -9,6 +9,7 @@ import (
 
 type FileRepository interface {
 	CreateOrUpdateFiles(ctx context.Context, record *model.FileRecord) error
+	GetFiles(ctx context.Context, user string) (*model.FileRecord, error)
 }
 
 type FileService struct {
@@ -24,4 +25,12 @@ func (f *FileService) UploadFilesMeta(ctx context.Context, record *model.FileRec
 		return fmt.Errorf("failure to save records %+v: %s", record, err)
 	}
 	return nil
+}
+
+func (f *FileService) GetUserFiles(ctx context.Context, user string) (*model.FileRecord, error) {
+	files, err := f.r.GetFiles(ctx, user)
+	if err != nil {
+		return nil, fmt.Errorf("failure to get user %s files: %s", user, err)
+	}
+	return files, nil
 }
