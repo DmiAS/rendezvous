@@ -1,7 +1,6 @@
 package punching
 
 import (
-	"context"
 	"net"
 
 	"github.com/rs/zerolog/log"
@@ -23,12 +22,7 @@ func (p *Puncher) register(req request) {
 		LocalAddress:  reg.Address,
 		GlobalAddress: req.addr.String(),
 	}
-	if err := p.u.AddUser(context.Background(), user); err != nil {
-		msg := "failure to add new user"
-		log.Error().Err(err).Msg(msg)
-		p.sendRegisterApprove(req.addr, msg)
-		return
-	}
+	p.u.AddUser(user)
 	p.sendRegisterApprove(req.addr, "")
 }
 

@@ -1,7 +1,6 @@
 package punching
 
 import (
-	"context"
 	"fmt"
 	"net"
 	"time"
@@ -23,13 +22,13 @@ func (p *Puncher) initConnection(req request) {
 		return
 	}
 
-	initiatorData, err := p.u.GetUser(context.Background(), connRequest.Initiator)
+	initiatorData, err := p.u.GetUser(connRequest.Initiator)
 	if err != nil {
 		log.Error().Err(err).Msgf("failure to get user %s data", connRequest.Initiator)
 		return
 	}
 
-	targetData, err := p.u.GetUser(context.Background(), connRequest.Target)
+	targetData, err := p.u.GetUser(connRequest.Target)
 	if err != nil {
 		log.Error().Err(err).Msgf("failure to get user %s data", connRequest.Target)
 		return
@@ -58,11 +57,11 @@ func (p *Puncher) initConnection(req request) {
 	}
 
 	// set block status to each user
-	if err := p.u.BlockUser(context.Background(), initiatorData.Name); err != nil {
+	if err := p.u.BlockUser(initiatorData.Name); err != nil {
 		log.Error().Err(err).Msgf("failure to block user: %s", initiatorData.Name)
 	}
 
-	if err := p.u.BlockUser(context.Background(), targetData.Name); err != nil {
+	if err := p.u.BlockUser(targetData.Name); err != nil {
 		log.Error().Err(err).Msgf("failure to block user: %s", targetData.Name)
 	}
 }
