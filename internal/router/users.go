@@ -6,7 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog/log"
 
-	"rendezvous/internal/model"
+	"github.com/DmiAS/rendezvous/internal/model"
 )
 
 func (r *Router) GetUsers(c *fiber.Ctx) error {

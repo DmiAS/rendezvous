@@ -11,13 +11,13 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/rs/zerolog/pkgerrors"
 
-	"rendezvous/internal/config"
-	"rendezvous/internal/punching"
-	"rendezvous/internal/repository/mdb"
-	"rendezvous/internal/router"
-	"rendezvous/internal/server"
-	"rendezvous/internal/service"
-	"rendezvous/pkg/mongodb"
+	"github.com/DmiAS/rendezvous/internal/config"
+	"github.com/DmiAS/rendezvous/internal/punching"
+	"github.com/DmiAS/rendezvous/internal/repository/mdb"
+	"github.com/DmiAS/rendezvous/internal/router"
+	"github.com/DmiAS/rendezvous/internal/server"
+	"github.com/DmiAS/rendezvous/internal/service"
+	"github.com/DmiAS/rendezvous/pkg/mongodb"
 )
 
 const (

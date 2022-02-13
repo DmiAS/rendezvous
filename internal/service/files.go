@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"rendezvous/internal/model"
+	"github.com/DmiAS/rendezvous/internal/model"
 )
 
 type FileRepository interface {

@@ -6,8 +6,8 @@ import (
 
 	"github.com/rs/zerolog/log"
 
-	"rendezvous/internal/model"
-	"rendezvous/pkg/proto"
+	"github.com/DmiAS/rendezvous/internal/model"
+	"github.com/DmiAS/rendezvous/pkg/proto"
 )
 
 func (p *Puncher) register(req request) {

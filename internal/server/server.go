@@ -9,8 +9,8 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/rs/zerolog/log"
 
-	"rendezvous/internal/config"
-	"rendezvous/internal/router"
+	"github.com/DmiAS/rendezvous/internal/config"
+	"github.com/DmiAS/rendezvous/internal/router"
 )
 
 type Server struct {

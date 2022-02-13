@@ -3,7 +3,7 @@ package router
 import (
 	"context"
 
-	"rendezvous/internal/model"
+	"github.com/DmiAS/rendezvous/internal/model"
 )
 
 type UserService interface {

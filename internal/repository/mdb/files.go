@@ -8,7 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"rendezvous/internal/model"
+	"github.com/DmiAS/rendezvous/internal/model"
 )
 
 type FileRepository struct {
