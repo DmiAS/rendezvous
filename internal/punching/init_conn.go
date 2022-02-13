@@ -34,7 +34,7 @@ func (p *Puncher) initConnection(req request) {
 		return
 	}
 
-	if err := p.sendUserData(initiatorData.GlobalAddress, targetData); err != nil {
+	if err := p.sendUserData(initiatorData.GlobalAddress, targetData, proto.ResponseForInitiator); err != nil {
 		log.Error().
 			Err(err).
 			Msgf(
@@ -45,7 +45,7 @@ func (p *Puncher) initConnection(req request) {
 		return
 	}
 
-	if err := p.sendUserData(targetData.GlobalAddress, initiatorData); err != nil {
+	if err := p.sendUserData(targetData.GlobalAddress, initiatorData, proto.ResponseForTarget); err != nil {
 		log.Error().
 			Err(err).
 			Msgf(
@@ -66,9 +66,9 @@ func (p *Puncher) initConnection(req request) {
 	}
 }
 
-func (p *Puncher) sendUserData(globalAddr string, user *model.User) error {
+func (p *Puncher) sendUserData(globalAddr string, user *model.User, action uint8) error {
 	info := &proto.ConnResponse{GlobalAddress: user.GlobalAddress, LocalAddress: user.LocalAddress}
-	header := &proto.Header{Action: proto.ResponseConnection}
+	header := &proto.Header{Action: action}
 
 	data, err := proto.Packet{Header: header, Data: info}.Marshal()
 	if err != nil {
