@@ -78,9 +78,7 @@ func (l *Listener) Unsubscribe(name string, event uint8) {
 		for i := range subs {
 			if subs[i].name == name {
 				subs[i] = subs[len(subs)-1]
-				log.Debug().Msgf("subs before unsub = %+v", subs)
 				subs = subs[:len(subs)-1]
-				log.Debug().Msgf("subs after unsub = %+v", subs)
 				break
 			}
 		}
