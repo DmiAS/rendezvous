@@ -2,10 +2,11 @@ package client
 
 import (
 	"context"
-	"log"
 	"net"
 	"sync"
 	"time"
+
+	"github.com/rs/zerolog/log"
 
 	"github.com/DmiAS/rendezvous/pkg/proto"
 )
