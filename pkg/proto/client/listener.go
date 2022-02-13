@@ -31,6 +31,7 @@ type Listener struct {
 
 const (
 	sendTimeout = time.Second
+	chanSize    = 5
 )
 
 func NewListener(conn net.PacketConn) *Listener {
@@ -59,7 +60,7 @@ func (l *Listener) Listen(ctx context.Context) {
 }
 
 func (l *Listener) Subscribe(name string, event uint8) chan Request {
-	ch := make(chan Request)
+	ch := make(chan Request, chanSize)
 	sub := subscriber{name: name, ch: ch}
 	l.mu.Lock()
 	if subs, ok := l.subs[event]; !ok {

@@ -3,16 +3,11 @@ package punching
 import (
 	"fmt"
 	"net"
-	"time"
 
 	"github.com/rs/zerolog/log"
 
 	"github.com/DmiAS/rendezvous/internal/model"
 	"github.com/DmiAS/rendezvous/pkg/proto"
-)
-
-const (
-	writeDeadline = 5 * time.Second
 )
 
 func (p *Puncher) initConnection(req request) {

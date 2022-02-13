@@ -18,6 +18,7 @@ func (c *Client) Register(name string) error {
 
 	ch := c.listener.Subscribe(clientID, proto.RegisterApprove)
 	defer c.listener.Unsubscribe(clientID, proto.RegisterApprove)
+
 	return c.waitRegApprove(ch)
 }
 

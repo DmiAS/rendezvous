@@ -31,6 +31,7 @@ func NewClient(ctx context.Context, port string, rendezvousAddress string) (*Cli
 	if err != nil {
 		return nil, fmt.Errorf("failure to get local address: %s", err)
 	}
+
 	localAddress += ":" + port
 	conn, err := net.ListenPacket(network, localAddress)
 	if err != nil {
