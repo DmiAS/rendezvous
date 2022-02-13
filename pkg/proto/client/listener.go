@@ -8,7 +8,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 
-	"rendezvous/pkg/proto"
+	"github.com/DmiAS/rendezvous/pkg/proto"
 )
 
 type Request struct {
