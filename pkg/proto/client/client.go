@@ -28,7 +28,7 @@ const (
 	pingMessage    = "ping"
 )
 
-func NewClient(ctx context.Context, name string, port string, rendezvousAddress string) (*Client, error) {
+func NewClient(ctx context.Context, port string, rendezvousAddress string) (*Client, error) {
 	localAddress, err := resolveLocalIpAddress()
 	if err != nil {
 		return nil, fmt.Errorf("failure to get local address: %s", err)
@@ -49,8 +49,7 @@ func NewClient(ctx context.Context, name string, port string, rendezvousAddress 
 	go l.Listen(ctx)
 
 	return &Client{
-		rendezvousAddress: addr, localAddress: localAddress, conn: conn, name: name,
-		listener: l,
+		rendezvousAddress: addr, localAddress: localAddress, conn: conn, listener: l,
 	}, nil
 }
 
@@ -95,7 +94,8 @@ func (c *Client) Close() error {
 	return c.conn.Close()
 }
 
-func (c *Client) Register() error {
+func (c *Client) Register(name string) error {
+	c.name = name
 	if err := c.sendRegRequest(); err != nil {
 		return err
 	}
