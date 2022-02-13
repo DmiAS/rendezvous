@@ -21,11 +21,13 @@ func NewUserService(r UserRepository) *UserService {
 	return &UserService{r: r}
 }
 
-func (u *UserService) GetUsers() *model.InnerUsers {
+func (u *UserService) GetUsers(name string) *model.InnerUsers {
 	users := u.r.GetUsers()
 	names := make([]string, 0, len(users))
 	for i := range users {
-		names = append(names, users[i].Name)
+		if users[i].Name != name {
+			names = append(names, users[i].Name)
+		}
 	}
 	return &model.InnerUsers{Names: names}
 }

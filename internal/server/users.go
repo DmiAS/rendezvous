@@ -7,6 +7,7 @@ import (
 )
 
 func (s *Server) getUsers(c *fiber.Ctx) error {
-	users := s.u.GetUsers()
+	name := c.Params(userName)
+	users := s.u.GetUsers(name)
 	return c.Status(http.StatusOK).JSON(users)
 }

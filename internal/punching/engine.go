@@ -59,7 +59,7 @@ func (p Puncher) handleConnection() {
 		log.Error().Err(err).Msg("failure to read datagram from socket")
 	}
 	req := request{data: data, addr: clientAddr}
-	log.Debug().Msgf("sending new request", req)
+	log.Debug().Msgf("sending new request to %s", clientAddr.String())
 	p.requests <- req
 }
 

@@ -14,7 +14,7 @@ import (
 )
 
 type UserService interface {
-	GetUsers() *model.InnerUsers
+	GetUsers(name string) *model.InnerUsers
 }
 
 type Server struct {
