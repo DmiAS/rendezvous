@@ -15,7 +15,7 @@ func NewUsersRepository() *UsersRepository {
 	return &UsersRepository{m: sync.Map{}}
 }
 
-func (u *UsersRepository) GetUsers() (model.Users, error) {
+func (u *UsersRepository) GetUsers() model.Users {
 	// get all users who are not communicating right now
 	var users model.Users
 	u.m.Range(
@@ -27,7 +27,7 @@ func (u *UsersRepository) GetUsers() (model.Users, error) {
 			return true
 		},
 	)
-	return users, nil
+	return users
 }
 
 func (u *UsersRepository) GetUser(login string) (*model.User, error) {

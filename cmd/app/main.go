@@ -13,11 +13,10 @@ import (
 
 	"github.com/DmiAS/rendezvous/internal/config"
 	"github.com/DmiAS/rendezvous/internal/punching"
-	"github.com/DmiAS/rendezvous/internal/repository/mdb"
+	"github.com/DmiAS/rendezvous/internal/repository/mem"
 	"github.com/DmiAS/rendezvous/internal/router"
 	"github.com/DmiAS/rendezvous/internal/server"
 	"github.com/DmiAS/rendezvous/internal/service"
-	"github.com/DmiAS/rendezvous/pkg/mongodb"
 )
 
 const (
@@ -39,15 +38,8 @@ func main() {
 	// initialize logger
 	setupLogger(cfg)
 
-	// initialize db connection
-	mongoConn, err := mongodb.NewConnection(cfg.Mongo.DSN, cfg.Mongo.Database)
-	if err != nil {
-		log.Fatal().Err(err).Msg("failure to initialize connection to mongo")
-	}
-	defer mongoConn.Conn.Disconnect(context.Background())
-
 	// initialize repository
-	repo := mdb.NewUsersRepository(mongoConn.Db)
+	repo := mem.NewUsersRepository()
 
 	// initialize service
 	userService := service.NewUserService(repo)

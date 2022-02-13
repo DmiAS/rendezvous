@@ -8,18 +8,12 @@ import (
 
 type Config struct {
 	Server ServerConfig
-	Mongo  MongoConfig
 }
 
 type ServerConfig struct {
 	Host  string
 	Port  int
 	Debug bool
-}
-
-type MongoConfig struct {
-	DSN      string
-	Database string
 }
 
 const (

@@ -1,13 +1,9 @@
 package router
 
-import (
-	"context"
-
-	"github.com/DmiAS/rendezvous/internal/model"
-)
+import "github.com/DmiAS/rendezvous/internal/model"
 
 type UserService interface {
-	GetUsers(ctx context.Context) (model.InnerUsers, error)
+	GetUsers() *model.InnerUsers
 }
 type Router struct {
 	u UserService
