@@ -39,7 +39,7 @@ func (p *Puncher) initConnection(req request) {
 		log.Error().
 			Err(err).
 			Msgf(
-				"failure to send requested data for user %s to initiator %s",
+				"failure to send to user %s data about %s",
 				initiatorData.Name,
 				targetData.Name,
 			)
@@ -50,11 +50,20 @@ func (p *Puncher) initConnection(req request) {
 		log.Error().
 			Err(err).
 			Msgf(
-				"failure to send requested data for user %s to initiator %s",
-				initiatorData.Name,
+				"failure to send to user %s data about %s",
 				targetData.Name,
+				initiatorData.Name,
 			)
 		return
+	}
+
+	// set block status to each user
+	if err := p.u.BlockUser(context.Background(), initiatorData.Name); err != nil {
+		log.Error().Err(err).Msgf("failure to block user: %s", initiatorData.Name)
+	}
+
+	if err := p.u.BlockUser(context.Background(), targetData.Name); err != nil {
+		log.Error().Err(err).Msgf("failure to block user: %s", targetData.Name)
 	}
 }
 

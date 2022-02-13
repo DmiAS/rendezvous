@@ -11,6 +11,7 @@ import (
 
 type UserService interface {
 	AddUser(ctx context.Context, user *model.User) error
+	BlockUser(ctx context.Context, user string) error
 	GetUser(ctx context.Context, login string) (*model.User, error)
 	DeleteUser(ctx context.Context, login string) error
 }

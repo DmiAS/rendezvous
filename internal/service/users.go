@@ -22,21 +22,16 @@ func NewUserService(r UserRepository) *UserService {
 	return &UserService{r: r}
 }
 
-func (u *UserService) GetUsers(ctx context.Context) (model.InnerUsers, error) {
+func (u *UserService) GetUsers(ctx context.Context) (*model.InnerUsers, error) {
 	users, err := u.r.GetUsers(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failure to retrive users data from db: %s", err)
 	}
-	innerUsers := make(model.InnerUsers, 0, len(users))
+	names := make([]string, 0, len(users))
 	for i := range users {
-		innerUsers = append(
-			innerUsers, model.InnerUser{
-				Name:     users[i].Name,
-				Chatting: users[i].Chatting,
-			},
-		)
+		names = append(names, users[i].Name)
 	}
-	return innerUsers, nil
+	return &model.InnerUsers{Names: names}, nil
 }
 
 func (u *UserService) GetUser(ctx context.Context, login string) (*model.User, error) {
@@ -61,8 +56,8 @@ func (u *UserService) DeleteUser(ctx context.Context, login string) error {
 	return nil
 }
 
-func (u *UserService) UpdateUser(ctx context.Context, user *model.User) error {
-	if err := u.UpdateUser(ctx, user); err != nil {
+func (u *UserService) BlockUser(ctx context.Context, user string) error {
+	if err := u.r.UpdateUser(ctx, &model.User{Name: user, Blocked: true}); err != nil {
 		return fmt.Errorf("failure to update user with data %+v: %s", user, err)
 	}
 	return nil

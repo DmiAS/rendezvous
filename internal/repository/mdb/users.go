@@ -23,7 +23,8 @@ func NewUsersRepository(db *mongo.Database) *UsersRepository {
 }
 
 func (u UsersRepository) GetUsers(ctx context.Context) (model.Users, error) {
-	cursor, err := u.c.Find(ctx, bson.D{})
+	// get all users who are not communicating right now
+	cursor, err := u.c.Find(ctx, bson.D{{"blocked", false}})
 	if err != nil {
 		return nil, fmt.Errorf("failure to extract cursor: %s", err)
 	}
@@ -45,7 +46,7 @@ func (u UsersRepository) GetUser(ctx context.Context, login string) (*model.User
 
 func (u UsersRepository) UpdateUser(ctx context.Context, user *model.User) error {
 	updateData := map[string]interface{}{
-		"chatting": user.Chatting,
+		"blocked": user.Blocked,
 	}
 	if user.LocalAddress != "" {
 		updateData["local_address"] = user.LocalAddress
