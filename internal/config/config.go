@@ -2,38 +2,33 @@ package config
 
 import (
 	"fmt"
+	"os"
 
-	"github.com/spf13/viper"
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
-	Server ServerConfig
-}
-
-type ServerConfig struct {
 	Host  string
-	Port  int
+	Port  string
 	Debug bool
 }
 
 const (
-	configName = "config"
-	configType = "yaml"
+	hostEnv  = "S_HOST"
+	portEnv  = "S_PORT"
+	debugEnv = "S_DEBUG"
 )
 
-func NewConfig(configPath string) (*Config, error) {
-	if configPath == "" {
-		return nil, fmt.Errorf("empty path")
+func NewConfig() *Config {
+	// load env from .env file
+	if err := godotenv.Load(); err != nil {
+		fmt.Printf("failure to load env")
 	}
-	viper.SetConfigName(configName)
-	viper.SetConfigType(configType)
-	viper.AddConfigPath(configPath)
-	if err := viper.ReadInConfig(); err != nil {
-		return nil, fmt.Errorf("failure to read config directory %s: %s", configPath, err)
+
+	cfg := &Config{
+		Host:  os.Getenv(hostEnv),
+		Port:  os.Getenv(portEnv),
+		Debug: os.Getenv(debugEnv) != "",
 	}
-	cfg := &Config{}
-	if err := viper.Unmarshal(cfg); err != nil {
-		return nil, fmt.Errorf("failture to unmarshal config into struct: %s", err)
-	}
-	return cfg, nil
+	return cfg
 }

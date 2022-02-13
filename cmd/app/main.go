@@ -2,11 +2,9 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/signal"
 
-	"github.com/joho/godotenv"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/rs/zerolog/pkgerrors"
@@ -18,21 +16,9 @@ import (
 	"github.com/DmiAS/rendezvous/internal/service"
 )
 
-const (
-	configEnv = "CONFIG_PATH"
-)
-
 func main() {
-	// load env from .env file
-	if err := godotenv.Load(); err != nil {
-		fmt.Printf("failure to load env")
-	}
-
 	// read configuration
-	cfg, err := config.NewConfig(os.Getenv(configEnv))
-	if err != nil {
-		panic("failure to read config:" + err.Error())
-	}
+	cfg := config.NewConfig()
 
 	// initialize logger
 	setupLogger(cfg)
@@ -44,7 +30,7 @@ func main() {
 	userService := service.NewUserService(repo)
 
 	// initialize server
-	srv := server.NewServer(cfg.Server, userService)
+	srv := server.NewServer(cfg, userService)
 
 	// initialize punch server
 	punchSrv := punching.NewPuncher(userService)
@@ -75,7 +61,7 @@ func runServer(srv *server.Server, punchServer *punching.Puncher) {
 }
 
 func setupLogger(cfg *config.Config) {
-	if cfg.Server.Debug {
+	if cfg.Debug {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	} else {
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)
