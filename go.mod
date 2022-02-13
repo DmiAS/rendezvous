@@ -1,4 +1,4 @@
-module rendezvous
+module github.com/DmiAS/rendezvous
 
 go 1.16
 
