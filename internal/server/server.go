@@ -10,19 +10,23 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/DmiAS/rendezvous/internal/config"
-	"github.com/DmiAS/rendezvous/internal/router"
+	"github.com/DmiAS/rendezvous/internal/model"
 )
+
+type UserService interface {
+	GetUsers() *model.InnerUsers
+}
 
 type Server struct {
 	hostAddress string
 	app         *fiber.App
-	router      *router.Router
+	u           UserService
 }
 
-func NewServer(cfg config.ServerConfig, router *router.Router) *Server {
+func NewServer(cfg config.ServerConfig, u UserService) *Server {
 	srv := &Server{
 		hostAddress: fmt.Sprintf("%s:%d", cfg.Host, cfg.Port),
-		router:      router,
+		u:           u,
 	}
 	srv.app = fiber.New(
 		fiber.Config{

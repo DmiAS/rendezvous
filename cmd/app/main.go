@@ -14,7 +14,6 @@ import (
 	"github.com/DmiAS/rendezvous/internal/config"
 	"github.com/DmiAS/rendezvous/internal/punching"
 	"github.com/DmiAS/rendezvous/internal/repository/mem"
-	"github.com/DmiAS/rendezvous/internal/router"
 	"github.com/DmiAS/rendezvous/internal/server"
 	"github.com/DmiAS/rendezvous/internal/service"
 )
@@ -44,11 +43,8 @@ func main() {
 	// initialize service
 	userService := service.NewUserService(repo)
 
-	// initialize router
-	r := router.NewRouter(userService)
-
 	// initialize server
-	srv := server.NewServer(cfg.Server, r)
+	srv := server.NewServer(cfg.Server, userService)
 
 	// initialize punch server
 	punchSrv := punching.NewPuncher(userService)

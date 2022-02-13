@@ -7,6 +7,6 @@ const (
 )
 
 func (s *Server) initRoutes() {
-	s.app.Get(apiPrefix+ping, s.router.Ping)
-	s.app.Get(apiPrefix+users, s.router.GetUsers)
+	s.app.Get(apiPrefix+ping, s.ping)
+	s.app.Get(apiPrefix+users, s.getUsers)
 }
