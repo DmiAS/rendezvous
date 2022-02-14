@@ -4,7 +4,7 @@ import "github.com/gofiber/fiber/v2/middleware/cors"
 
 const (
 	apiPrefix = "/api/v1"
-	ping      = "ping"
+	ping      = "/ping"
 	users     = "/users"
 	userName  = "user"
 )

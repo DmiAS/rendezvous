@@ -26,7 +26,7 @@ func NewConfig() *Config {
 	}
 
 	cfg := &Config{
-		Host:  os.Getenv(hostEnv),
+		Host:  "localhost",
 		Port:  os.Getenv(portEnv),
 		Debug: os.Getenv(debugEnv) != "",
 	}
