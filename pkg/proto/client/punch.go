@@ -14,7 +14,7 @@ import (
 // which consists in sequentially sending messages to each of the addresses until a response is received from at
 // least one
 func (c *Client) punch(connResp *proto.ConnResponse, action uint8) (net.Addr, error) {
-	ping := &proto.Punch{Msg: pingMessage}
+	ping := &proto.Punch{Msg: connResp.Name}
 	header := &proto.Header{Action: action}
 
 	data, err := proto.Packet{Header: header, Data: ping}.Marshal()
@@ -75,7 +75,7 @@ func (c *Client) waitForSignalToStartPunch(ctx context.Context) {
 				log.Debug().Err(err).Msg("failure to punch initiator")
 			} else {
 				// if the breakout was successful, then we send a signal that you need to start listening
-				c.signalChan <- struct{}{}
+				c.signalChan <- []byte(connResp.Name)
 			}
 		}
 	}

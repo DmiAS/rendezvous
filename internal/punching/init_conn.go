@@ -62,7 +62,7 @@ func (p *Puncher) initConnection(req request) {
 }
 
 func (p *Puncher) sendUserData(globalAddr string, user *model.User, action uint8) error {
-	info := &proto.ConnResponse{GlobalAddress: user.GlobalAddress, LocalAddress: user.LocalAddress}
+	info := &proto.ConnResponse{GlobalAddress: user.GlobalAddress, LocalAddress: user.LocalAddress, Name: user.Name}
 	header := &proto.Header{Action: action}
 
 	data, err := proto.Packet{Header: header, Data: info}.Marshal()

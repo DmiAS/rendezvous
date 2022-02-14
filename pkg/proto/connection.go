@@ -11,6 +11,7 @@ type ConnRequest struct {
 }
 
 type ConnResponse struct {
+	Name          string
 	LocalAddress  string
 	GlobalAddress string
 }

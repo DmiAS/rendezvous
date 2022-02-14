@@ -14,7 +14,7 @@ type Client struct {
 	conn              net.PacketConn
 	listener          *Listener
 	// we use it to notify upper lever to start serve connections
-	signalChan chan struct{}
+	signalChan chan []byte
 }
 
 const (
@@ -49,7 +49,7 @@ func NewClient(ctx context.Context, port string, rendezvousAddress string) (*Cli
 
 	cli := &Client{
 		rendezvousAddress: addr, localAddress: localAddress, conn: conn, listener: l,
-		signalChan: make(chan struct{}),
+		signalChan: make(chan []byte),
 	}
 
 	// starting listen for initiate connection messages from server
@@ -61,7 +61,7 @@ func (c *Client) GetConnection() net.PacketConn {
 	return c.conn
 }
 
-func (c *Client) GetSignalChan() <-chan struct{} {
+func (c *Client) GetSignalChan() <-chan []byte {
 	return c.signalChan
 }
 
