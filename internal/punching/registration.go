@@ -22,11 +22,13 @@ func (p *Puncher) register(req request) {
 		LocalAddress:  reg.Address,
 		GlobalAddress: req.addr.String(),
 	}
+	log.Debug().Msgf("new registration: %+v", user)
 	p.u.AddUser(user)
 	p.sendRegisterApprove(req.addr, "")
 }
 
 func (p *Puncher) sendRegisterApprove(addr net.Addr, msg string) {
+	log.Debug().Msgf("send reg approve to %s", addr)
 	approve := &proto.RegistrationApprove{
 		Error: false,
 		Msg:   msg,

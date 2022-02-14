@@ -22,13 +22,16 @@ func (p *Puncher) initConnection(req request) {
 		log.Error().Err(err).Msgf("failure to get user %s data", connRequest.Initiator)
 		return
 	}
+	log.Debug().Msgf("retrieve initiatorData %+v", initiatorData)
 
 	targetData, err := p.u.GetUser(connRequest.Target)
 	if err != nil {
 		log.Error().Err(err).Msgf("failure to get user %s data", connRequest.Target)
 		return
 	}
+	log.Debug().Msgf("retrieve targetData %+v", targetData)
 
+	log.Debug().Msgf("send target data to %s", initiatorData.GlobalAddress)
 	if err := p.sendUserData(initiatorData.GlobalAddress, targetData, proto.ResponseForInitiator); err != nil {
 		log.Error().
 			Err(err).
@@ -40,6 +43,7 @@ func (p *Puncher) initConnection(req request) {
 		return
 	}
 
+	log.Debug().Msgf("send target data to %s", targetData.GlobalAddress)
 	if err := p.sendUserData(targetData.GlobalAddress, initiatorData, proto.ResponseForTarget); err != nil {
 		log.Error().
 			Err(err).
