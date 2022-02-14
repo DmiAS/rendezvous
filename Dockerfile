@@ -14,7 +14,7 @@ WORKDIR /server
 # Copy everything required from the go stage into the final stage
 COPY --from=go /server/bin/app ./app
 # Set the host and port
-ENV S_PORT="8081"
+ENV PORT="8081"
 EXPOSE 8081
 EXPOSE 9000/udp
 ## Further actions will be performed as a non-privileged user

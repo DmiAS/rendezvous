@@ -14,9 +14,8 @@ type Config struct {
 }
 
 const (
-	hostEnv  = "S_HOST"
-	portEnv  = "S_PORT"
-	debugEnv = "S_DEBUG"
+	portEnv  = "PORT"
+	debugEnv = "DEBUG"
 )
 
 func NewConfig() *Config {
