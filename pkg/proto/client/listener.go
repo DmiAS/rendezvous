@@ -27,6 +27,7 @@ type Listener struct {
 	mu   sync.RWMutex
 	subs Subscribers
 	conn net.PacketConn
+	stop chan struct{}
 }
 
 const (
@@ -35,14 +36,18 @@ const (
 )
 
 func NewListener(conn net.PacketConn) *Listener {
-	return &Listener{conn: conn, mu: sync.RWMutex{}, subs: make(Subscribers)}
+	return &Listener{conn: conn, mu: sync.RWMutex{}, subs: make(Subscribers), stop: make(chan struct{})}
 }
 
 func (l *Listener) Listen(ctx context.Context) {
 	for {
 		select {
+		case <-l.stop:
+			log.Info().Msg("listen stopped")
+			return
 		case <-ctx.Done():
 			log.Info().Msg("listener stopped")
+			return
 		default:
 			buffer := [512]byte{}
 			n, addr, err := l.conn.ReadFrom(buffer[:])

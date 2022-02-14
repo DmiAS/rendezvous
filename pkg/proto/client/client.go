@@ -57,6 +57,10 @@ func NewClient(ctx context.Context, port string, rendezvousAddress string) (*Cli
 	return cli, nil
 }
 
+func (c *Client) StopListener() {
+	c.listener.stop <- struct{}{}
+}
+
 func (c *Client) GetConnection() net.PacketConn {
 	return c.conn
 }
