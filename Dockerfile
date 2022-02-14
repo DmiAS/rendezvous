@@ -6,7 +6,7 @@ COPY ./go.mod ./go.sum ./
 RUN go mod download
 # Import code from the context
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -o ./bin/app ./cmd/app/main.go
+RUN CGO_ENABLED=0 go build -o ./bin/app ./cmd/app/main.go
 
 FROM alpine as app
 # Set the working directory

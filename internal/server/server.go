@@ -25,7 +25,7 @@ type Server struct {
 
 func NewServer(cfg *config.Config, u UserService) *Server {
 	srv := &Server{
-		hostAddress: fmt.Sprintf("%s:%s", cfg.Host, cfg.Port),
+		hostAddress: fmt.Sprintf(":" + cfg.Port),
 		u:           u,
 	}
 	srv.app = fiber.New(
