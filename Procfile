@@ -1,1 +1,1 @@
-web: cmd/app
+web: rendezvous/cmd/app
